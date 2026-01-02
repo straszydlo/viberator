@@ -1,0 +1,8 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    post_start:
+      - command: ["ollama", "pull", "gemma3:1b"]
+    ports:
+      - 8080:11434
+
