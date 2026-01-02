@@ -1,11 +1,52 @@
 import json
+import logging
 import requests
 
-payload = {'model': 'gemma3:1b', 'prompt': 'Say hello!', 'system': '', 'options': {'temperature': 0.5, 'max_tokens': 100}}
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
-response = requests.post("http://localhost:8080/api/generate", data=json.dumps(payload))
-lines = response.text.splitlines()
-bits = list(map(lambda x: json.loads(x), lines))
-pieces = list(map(lambda x: x['response'], bits))
+class OllamaRequest:
+  def __init__(self, uri, data):
+    self.uri = uri
+    self.data = data
+  def __str__(self):
+    return "(uri=" + self.uri + ", data=" + str(self.data) + ")"
 
-print(''.join(pieces))
+class OllamaResponse:
+  def __init__(self, response, context):
+    self.response = response
+    self.context = context
+  def __str__(self):
+    return "(response=" + self.response + ", context=" + str(self.context) + ")"
+
+def callOllama(req):
+  rawResponse = requests.post(req.uri, data=json.dumps(req.data))
+  logger.debug(rawResponse.text)
+  lines = rawResponse.text.splitlines()
+  bits = list(map(lambda x: json.loads(x), lines))
+  responsePieces = map(lambda x: x['response'], bits)
+  return OllamaResponse(''.join(responsePieces), bits[-1]['context'])
+
+def simplePayload(prompt, context=None):
+  payload = {'model': 'gemma3:1b', 'prompt': prompt, 'system': '', 'options': {'temperature': 0.5, 'max_tokens': 100}}
+  if (context == None):
+    pass
+  else:
+    payload['context'] = context
+  return payload
+
+def askOllama(prompt, context=None):
+  print(f">>> {prompt}")
+  payload = simplePayload(prompt, context)
+  req = OllamaRequest('http://localhost:8080/api/generate', payload)
+  response = callOllama(req)
+  print(response.response)
+  return response.context
+
+def main():
+  ctx1 = askOllama('Say hello!')
+  ctx2 = askOllama('How\'s the weather in Llamaland?', ctx1)
+  askOllama('Please repeat your first response, word-for-word.', ctx2)
+
+if __name__ == '__main__':
+  main()
