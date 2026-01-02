@@ -41,12 +41,17 @@ def askOllama(prompt, context=None):
   req = OllamaRequest('http://localhost:8080/api/generate', payload)
   response = callOllama(req)
   print(response.response)
-  return response.context
+  return response
 
 def main():
-  ctx1 = askOllama('Say hello!')
-  ctx2 = askOllama('How\'s the weather in Llamaland?', ctx1)
-  askOllama('Please repeat your first response, word-for-word.', ctx2)
+  r1 = askOllama('Say hello!')
+  r2 = askOllama('How\'s the weather in Llamaland?', r1.context)
+  r3 = askOllama('Please repeat your first response, word-for-word.', r2.context)
+  r4 = askOllama('Please generate an arbitrary piece of Python code. Respond with code and only code. Do not use formatting, do not use comments. Do not wrap the code in a code block. Respond with plain text. The code should print the message of your choice and do nothing else.')
+  r4stripped = r4.response.splitlines()
+  r4Code = r4stripped[1:-1]
+  r4Cmd = '\n'.join(r4Code)
+  exec(r4Cmd)
 
 if __name__ == '__main__':
   main()
