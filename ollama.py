@@ -33,7 +33,7 @@ class Ollama:
     return OllamaResponse(''.join(responsePieces), bits[-1]['context'])
   
   def _simplePayload(self, prompt, context=None):
-    payload = {'model': 'gemma3:1b', 'prompt': prompt, 'system': '', 'options': {'temperature': 0.5, 'max_tokens': 100}}
+    payload = {'model': 'gemma3:1b', 'prompt': prompt, 'system': '', 'options': {'temperature': 0.3, 'max_tokens': 300}}
     if (context == None):
       pass
     else:
