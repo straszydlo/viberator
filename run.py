@@ -10,7 +10,7 @@ def main():
   r1 = ollama.ask('Please respond to every following request with Python code and code only. Do not use formatting, do not use comments. The code should do only what was asked, and nothing else. For starters, generate a piece of code that prints simple greeting.')
   executeLLMPythonOutput(r1)
   testvar = 'This is a testvar'
-  r2 = ollama.ask('Please write a piece of Python code that prints the contents of the field "testvar" of a dictionary named "env". Do not declare or define the dictionary. Assume the dictionary is already defined.')
+  r2 = ollama.ask('Please write a piece of Python code that prints the contents of a variable named "testvar". Do not declare or define the variable. Assume the variable is already defined.')
   executeLLMPythonOutput(r2, {'testvar': testvar})
 
 def sanitizeLLMPythonOutput(response):
@@ -20,7 +20,7 @@ def sanitizeLLMPythonOutput(response):
 def executeLLMPythonOutput(response, env = {}):
   cmd = sanitizeLLMPythonOutput(response)
   logger.warning(warning(f"Attempting to execute {cmd}."))
-  exec(cmd)
+  exec(cmd, env)
 
 if __name__ == '__main__':
   main()
